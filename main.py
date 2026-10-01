@@ -100,88 +100,94 @@ let height = canvas.height = window.innerHeight;
 </script>
 """
 
-# --- ❄️ 純 CSS 動態雪花特效（穩定且保證看得見） ---
+# --- ❄️ 互動式滑鼠風向下雪特效（直接渲染版） ---
 st.markdown("""
-    <style>
-    /* 讓整個下雪容器覆蓋全螢幕且不擋住點擊 */
-    .snow-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        pointer-events: none;
-        z-index: 999999;
-        overflow: hidden;
-    }
-
-    /* 單顆雪花的基礎樣式 */
-    .snowflake {
-        position: absolute;
-        top: -10px;
-        background-color: #ffffff;
-        border-radius: 50%;
-        opacity: 0.8;
-        animation: fall linear infinite;
-    }
-
-    /* 雪花往下掉落的動畫 */
-    @keyframes fall {
-        0% {
-            transform: translateY(-10px) translateX(0);
-        }
-        50% {
-            transform: translateY(50vh) translateX(20px);
-        }
-        100% {
-            transform: translateY(105vh) translateX(-20px);
-        }
-    }
-
-    /* 隨機產生不同大小、位置與速度的雪花 */
-    .snowflake:nth-of-type(1) { left: 5%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 0s; }
-    .snowflake:nth-of-type(2) { left: 15%; width: 4px; height: 4px; animation-duration: 9s; animation-delay: 2s; }
-    .snowflake:nth-of-type(3) { left: 25%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 1s; }
-    .snowflake:nth-of-type(4) { left: 35%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 3s; }
-    .snowflake:nth-of-type(5) { left: 45%; width: 7px; height: 7px; animation-duration: 6s; animation-delay: 0.5s; }
-    .snowflake:nth-of-type(6) { left: 55%; width: 4px; height: 4px; animation-duration: 10s; animation-delay: 4s; }
-    .snowflake:nth-of-type(7) { left: 65%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 1.5s; }
-    .snowflake:nth-of-type(8) { left: 75%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 2.5s; }
-    .snowflake:nth-of-type(9) { left: 85%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 3.5s; }
-    .snowflake:nth-of-type(10) { left: 95%; width: 6px; height: 6px; animation-duration: 6s; animation-delay: 1s; }
-    
-    .snowflake:nth-of-type(11) { left: 10%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 4s; }
-    .snowflake:nth-of-type(12) { left: 20%; width: 7px; height: 7px; animation-duration: 6s; animation-delay: 1s; }
-    .snowflake:nth-of-type(13) { left: 30%; width: 4px; height: 4px; animation-duration: 11s; animation-delay: 3s; }
-    .snowflake:nth-of-type(14) { left: 40%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 2s; }
-    .snowflake:nth-of-type(15) { left: 50%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 0s; }
-    .snowflake:nth-of-type(16) { left: 60%; width: 5px; height: 5px; animation-duration: 9s; animation-delay: 2.5s; }
-    .snowflake:nth-of-type(17) { left: 70%; width: 6px; height: 6px; animation-duration: 6s; animation-delay: 1.5s; }
-    .snowflake:nth-of-type(18) { left: 80%; width: 4px; height: 4px; animation-duration: 10s; animation-delay: 3.5s; }
-    .snowflake:nth-of-type(19) { left: 90%; width: 7px; height: 7px; animation-duration: 7s; animation-delay: 0.5s; }
-    </style>
-
-    <div class="snow-container">
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
+    <div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999;">
+        <canvas id="snowCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
     </div>
+    <script>
+    (function() {
+        const container = document.getElementById('snow-container');
+        if (!container) return;
+        
+        let canvas = document.getElementById('snowCanvas');
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+            canvas.id = 'snowCanvas';
+            container.appendChild(canvas);
+        }
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        let mouseX = width / 2;
+
+        // 即時追蹤整個畫面的滑鼠位置
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+        });
+
+        const numFlakes = 100;
+        const flakes = [];
+
+        for (let i = 0; i < numFlakes; i++) {
+            flakes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                r: Math.random() * 2.5 + 1, // 大小
+                d: Math.random() * numFlakes,
+                speedY: Math.random() * 1.2 + 0.4 // 下落速度
+            });
+        }
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // 雪花顏色
+            ctx.beginPath();
+            for (let i = 0; i < numFlakes; i++) {
+                let f = flakes[i];
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+            }
+            ctx.fill();
+            updateSnow();
+        }
+
+        let angle = 0;
+        function updateSnow() {
+            angle += 0.01;
+            // 根據滑鼠左右位置計算風向
+            let wind = (mouseX - width / 2) / (width / 2) * 2.0;
+
+            for (let i = 0; i < numFlakes; i++) {
+                let f = flakes[i];
+                
+                f.y += f.speedY;
+                f.x += Math.sin(angle + f.d) * 0.4 + wind * 0.6;
+
+                // 邊界循環
+                if (f.y > height) {
+                    f.y = 0;
+                    f.x = Math.random() * width;
+                }
+                if (f.x > width) {
+                    f.x = 0;
+                } else if (f.x < 0) {
+                    f.x = width;
+                }
+            }
+        }
+
+        // 啟動動畫
+        setInterval(drawSnow, 25);
+    })();
+    </script>
 """, unsafe_allow_html=True)
 
 # --- 2. 初始化登入狀態 ---
