@@ -54,7 +54,7 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     .block-container {
-        padding-top: 3rem !important;
+        padding-top: 3.5rem !important;
     }
 
     html, body, input, h3 {
@@ -66,32 +66,10 @@ st.markdown("""
         font-size: 1.6rem !important;
         color: #FF4B4B;
     }
-    /* 🟢 這裡修改：將進度條填充顏色改為亮綠色 (Neon Green) */
-    div[data-testid="stProgress"] div[role="progressbar"] {
+    
+    /* 🟢 完美將進度條藍色改成亮綠色 */
+    div[data-testid="stProgress"] div[data-baseweb="progress-bar"] > div {
         background-color: #00FF66 !important;
-    }
-    /* 🛠️ 徹底修復側邊欄按鈕：隱藏內部所有預設圖標/文字，並換成自訂按鈕 */
-    [data-testid="collapsedControl"] {
-        background-color: #0e1117 !important;
-        border: 1px solid rgba(250, 250, 250, 0.2) !important;
-        border-radius: 4px !important;
-        padding: 4px 10px !important;
-    }
-
-    /* 隱藏按鈕內部的原生成員（文字與 SVG）避免破圖殘影 */
-    [data-testid="collapsedControl"] svg,
-    [data-testid="collapsedControl"] span,
-    [data-testid="collapsedControl"] div {
-        display: none !important;
-    }
-
-    /* 顯示自訂的選單文字 */
-    [data-testid="collapsedControl"]::after {
-        content: "⚙️ 選單" !important;
-        color: #fafafa !important;
-        font-family: 'Courier New', monospace !important;
-        font-size: 0.85rem !important;
-        display: inline-block !important;
     }
     
     div[data-testid="column"] button {
