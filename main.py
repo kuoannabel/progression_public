@@ -57,20 +57,37 @@ st.markdown("""
         padding-top: 1rem !important;
     }
 
-    html, body,  input, h3, span {
+    html, body, input, h3, span {
         font-family: 'Courier New', monospace !important;
     }
-   
+
     h1 {
         font-family: 'Press Start 2P', cursive !important;
         font-size: 1.6rem !important;
         color: #FF4B4B;
     }
-    /* 徹底隱藏頂部導覽列/側邊欄開合按鈕的圖標殘影 */
-    header[data-testid="stHeader"] button, [data-testid="collapsedControl"] {
-    display: none !important;
+    
+    /* 🛠️ 完美修復側邊欄按鈕：將破圖文字變透明，並換成自訂按鈕圖標 */
+    [data-testid="collapsedControl"] {
+        color: transparent !important;
     }
+
+    [data-testid="collapsedControl"]::after {
+        content: "⚙️ 選單" !important;
+        color: #fafafa !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 0.85rem !important;
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: #0e1117;
+        padding: 4px 10px;
+        border: 1px solid rgba(250, 250, 250, 0.2);
+        border-radius: 4px;
+    }
+    
     div[data-testid="column"] button {
+        font-family: 'Courier New', monospace !important;
         background-color: #0e1117 !important;
         color: #fafafa !important;
         border: 1px solid rgba(250, 250, 250, 0.2) !important;
@@ -84,12 +101,6 @@ st.markdown("""
         border-color: #FF4B4B !important;
         color: #FF4B4B !important;
     }
-    /* 強制修正側邊欄收合按鈕的圖標字型與顯示異常 */
-button[data-testid="baseButton-header"], 
-button[kind="header"],
-[data-testid="stSidebarNavSeparator"] {
-    font-family: "Source Sans Pro", sans-serif !important;
-}
     </style>
 """, unsafe_allow_html=True)
 
