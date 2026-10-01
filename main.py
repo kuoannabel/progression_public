@@ -66,7 +66,10 @@ st.markdown("""
         font-size: 1.6rem !important;
         color: #FF4B4B;
     }
-    
+    /* 徹底隱藏頂部導覽列/側邊欄開合按鈕的圖標殘影 */
+    header[data-testid="stHeader"] button, [data-testid="collapsedControl"] {
+    display: none !important;
+    }
     div[data-testid="column"] button {
         background-color: #0e1117 !important;
         color: #fafafa !important;
@@ -183,6 +186,7 @@ st.markdown(f"""
     {bg_css}
     </style>
 """, unsafe_allow_html=True)
+
 if not st.session_state.token:
     st.subheader("Welcome to Progression!")
     st.markdown("Please click the **Log in** button in the top right corner to start your RPG journey.")
