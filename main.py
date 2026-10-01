@@ -255,7 +255,7 @@ setInterval(drawSnow, 25);
 """
 
 # 透過元件安全載入特效（設定 height=0 避免佔用頁面空間）
-components.html(snow_html, height=0, width=0)
+components.html(snow_html, height=1, width=0)
 
 # --- 2. 初始化登入狀態 ---
 if 'token' not in st.session_state:
