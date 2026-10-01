@@ -60,7 +60,10 @@ st.markdown("""
     html, body, button, input, h3, span {
         font-family: 'Courier New', monospace !important;
     }
-
+    /* 🛠️ 這裡加入：隱藏側邊欄收合按鈕的殘影文字 */
+    button[kind="header"] {
+        display: none !important;
+    }
     h1 {
         font-family: 'Press Start 2P', cursive !important;
         font-size: 1.6rem !important;
