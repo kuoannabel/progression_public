@@ -97,6 +97,45 @@ col_title, col_auth = st.columns([3, 1])
 
 with col_title:
     st.title("Progression")
+    
+
+
+with col_auth:
+    st.markdown("<br>", unsafe_allow_html=True)
+    if not st.session_state.token:
+        current_url = "https://progression-kuo.streamlit.app"
+
+        result = oauth2.authorize_button(
+            name="Log in",
+            icon=None,
+            redirect_uri=current_url,
+            scope="openid email profile",
+            key="top_login_button"
+        )
+        if result:
+            st.session_state.token = result.get("token")
+            import jwt
+            id_token = result.get("token", {}).get("id_token")
+            if id_token:
+                user_data_jwt = jwt.decode(id_token, options={"verify_signature": False})
+                st.session_state.user_info = user_data_jwt
+                
+                email = user_data_jwt.get("email")
+                st.session_state.user_data = load_user_data_from_cloud(email)
+                
+            st.rerun()
+    else:
+        user_name = st.session_state.user_info.get("name", "Adventurer")
+        st.markdown(f"👤 **{user_name}**")
+        if st.button("Log out", key="top_logout_button"):
+            st.session_state.token = None
+            st.session_state.user_info = None
+            st.session_state.user_data = None
+            st.rerun()
+
+st.divider()
+
+# --- 4. 主畫面內容 ---
 with st.sidebar:
     st.subheader("background style")
     
@@ -138,42 +177,6 @@ st.markdown(f"""
     {bg_css}
     </style>
 """, unsafe_allow_html=True)
-with col_auth:
-    st.markdown("<br>", unsafe_allow_html=True)
-    if not st.session_state.token:
-        current_url = "https://progression-kuo.streamlit.app"
-
-        result = oauth2.authorize_button(
-            name="Log in",
-            icon=None,
-            redirect_uri=current_url,
-            scope="openid email profile",
-            key="top_login_button"
-        )
-        if result:
-            st.session_state.token = result.get("token")
-            import jwt
-            id_token = result.get("token", {}).get("id_token")
-            if id_token:
-                user_data_jwt = jwt.decode(id_token, options={"verify_signature": False})
-                st.session_state.user_info = user_data_jwt
-                
-                email = user_data_jwt.get("email")
-                st.session_state.user_data = load_user_data_from_cloud(email)
-                
-            st.rerun()
-    else:
-        user_name = st.session_state.user_info.get("name", "Adventurer")
-        st.markdown(f"👤 **{user_name}**")
-        if st.button("Log out", key="top_logout_button"):
-            st.session_state.token = None
-            st.session_state.user_info = None
-            st.session_state.user_data = None
-            st.rerun()
-
-st.divider()
-
-# --- 4. 主畫面內容 ---
 if not st.session_state.token:
     st.subheader("Welcome to Progression!")
     st.markdown("Please click the **Log in** button in the top right corner to start your RPG journey.")
