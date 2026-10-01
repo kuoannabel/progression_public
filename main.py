@@ -57,7 +57,7 @@ st.markdown("""
         padding-top: 1rem !important;
     }
 
-    html, body, input, h3, span {
+    html, body, input, h3 {
         font-family: 'Courier New', monospace !important;
     }
 
