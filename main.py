@@ -197,12 +197,13 @@ else:
     # 計算百分比 (0 ~ 100)
     progress_pct = int(progress_ratio * 100)
 
-    # 自訂 RPG 風格的亮綠色經驗條
+    # 自訂 RPG 風格的亮綠色經驗條 experience bar 動態效果
     st.markdown(f"""
         <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 4px; color: #fafafa;">
             Progress to Next Level: {current_data['exp']} / {needed_exp} EXP ({progress_pct}%)
         </div>
         <div style="width: 100%; background-color: #1a1c29; border: 1px solid rgba(250, 250, 250, 0.2); border-radius: 4px; overflow: hidden; padding: 2px; margin-bottom: 1rem;">
+        
             <div style="width: {progress_pct}%; background-color: #00FF66; height: 16px; border-radius: 2px; box-shadow: 0 0 8px rgba(0, 255, 102, 0.6); transition: width 0.5s ease-in-out;"></div>
         </div>
     """, unsafe_allow_html=True)
