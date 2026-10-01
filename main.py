@@ -98,16 +98,16 @@ col_title, col_auth = st.columns([3, 1])
 with col_title:
     st.title("Progression")
 with st.sidebar:
-    st.subheader("🎨 冒險主題設定")
+    st.subheader("background style")
     
     # 讓使用者選擇背景風格
     theme_choice = st.selectbox(
-        "選擇你的世界觀 (Theme)",
-        ["經典深淵黑 (Dark Abyss)", "復古像素森林 (Pixel Forest)", "烈焰熔岩城堡 (Magma Castle)"]
+        "Theame Selection",
+        ["Dark Abyss", "Pixel Forest", "Magma Castle"]
     )
 
 # 根據使用者的選擇動態切換 CSS 樣式
-if theme_choice == "經典深淵黑 (Dark Abyss)":
+if theme_choice == "Dark Abyss":
     bg_css = """
     .stApp {
         background-color: #0f111a;
@@ -115,7 +115,7 @@ if theme_choice == "經典深淵黑 (Dark Abyss)":
     }
     section[data-testid="stSidebar"] { background-color: #141622; }
     """
-elif theme_choice == "復古像素森林 (Pixel Forest)":
+elif theme_choice == "Pixel Forest":
     bg_css = """
     .stApp {
         background-color: #0b1a12;
