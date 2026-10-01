@@ -67,11 +67,6 @@ st.markdown("""
         color: #FF4B4B;
     }
     
-    /* 🟢 完美將進度條藍色改成亮綠色 */
-    div[data-testid="stProgress"] div[data-baseweb="progress-bar"] > div {
-        background-color: #00FF66 !important;
-    }
-    
     div[data-testid="column"] button {
         font-family: 'Courier New', monospace !important;
         background-color: #0e1117 !important;
@@ -89,7 +84,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-   
 
 # --- 2. 初始化登入狀態 ---
 if 'token' not in st.session_state:
@@ -104,8 +98,6 @@ col_title, col_auth = st.columns([3, 1])
 
 with col_title:
     st.title("Progression")
-    
-
 
 with col_auth:
     st.markdown("<br>", unsafe_allow_html=True)
@@ -146,7 +138,7 @@ st.divider()
 with st.sidebar:
     st.subheader("Background Style")
     
-    # 讓使用者選擇背景風格
+    # 讓使用者選擇背景風格（選項與對應名稱保持一致）
     theme_choice = st.selectbox(
         "Theme Selection",
         ["Dark Abyss", "Pixel Forest", "Magma Castle"]
@@ -201,7 +193,19 @@ else:
     progress_ratio = min(current_data["exp"] / needed_exp, 1.0)
     
     st.metric(label="Level", value=f"Lv. {current_data['level']}", delta=f"Total EXP: {current_data['exp']}")
-    st.progress(progress_ratio, text=f"Progress to Next Level: {current_data['exp']} / {needed_exp} EXP")
+    
+    # 計算百分比 (0 ~ 100)
+    progress_pct = int(progress_ratio * 100)
+
+    # 自訂 RPG 風格的亮綠色經驗條
+    st.markdown(f"""
+        <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 4px; color: #fafafa;">
+            Progress to Next Level: {current_data['exp']} / {needed_exp} EXP ({progress_pct}%)
+        </div>
+        <div style="width: 100%; background-color: #1a1c29; border: 1px solid rgba(250, 250, 250, 0.2); border-radius: 4px; overflow: hidden; padding: 2px; margin-bottom: 1rem;">
+            <div style="width: {progress_pct}%; background-color: #00FF66; height: 16px; border-radius: 2px; box-shadow: 0 0 8px rgba(0, 255, 102, 0.6);"></div>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.divider()
 
