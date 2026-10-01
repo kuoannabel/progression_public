@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_oauth import OAuth2Component
 from supabase import create_client, Client
-
+import streamlit.components.v1 as components
 # --- Supabase 設定 ---
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
@@ -169,7 +169,92 @@ st.markdown("""
     setInterval(drawSnow, 25);
     </script>
 """, unsafe_allow_html=True)
+# --- ❄️ 滑鼠互動式下雪特效 ---
+snow_html = """
+<div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999;">
+    <canvas id="snowCanvas"></canvas>
+</div>
+<script>
+const canvas = document.getElementById('snowCanvas');
+const ctx = canvas.getContext('2d');
 
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+});
+
+let mouseX = width / 2;
+let mouseY = height / 2;
+
+// 即時追蹤滑鼠位置
+window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+const numFlakes = 120;
+const flakes = [];
+
+for (let i = 0; i < numFlakes; i++) {
+    flakes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 2.5 + 0.8, // 雪花大小
+        d: Math.random() * numFlakes,
+        speedY: Math.random() * 1.2 + 0.4 // 下落速度
+    });
+}
+
+function drawSnow() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.75)"; // 半透明白雪
+    ctx.beginPath();
+    for (let i = 0; i < numFlakes; i++) {
+        let f = flakes[i];
+        ctx.moveTo(f.x, f.y);
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+    }
+    ctx.fill();
+    updateSnow();
+}
+
+let angle = 0;
+function updateSnow() {
+    angle += 0.01;
+    // 根據滑鼠在畫面上的左右位置，計算風向偏移
+    let wind = (mouseX - width / 2) / (width / 2) * 1.8;
+
+    for (let i = 0; i < numFlakes; i++) {
+        let f = flakes[i];
+        
+        // 向下掉落
+        f.y += f.speedY;
+        // 結合自然搖晃與滑鼠風向
+        f.x += Math.sin(angle + f.d) * 0.4 + wind * 0.6;
+
+        // 邊界循環
+        if (f.y > height) {
+            f.y = 0;
+            f.x = Math.random() * width;
+        }
+        if (f.x > width) {
+            f.x = 0;
+        } else if (f.x < 0) {
+            f.x = width;
+        }
+    }
+}
+
+// 每 25 毫秒更新一次畫面
+setInterval(drawSnow, 25);
+</script>
+"""
+
+# 透過元件安全載入特效（設定 height=0 避免佔用頁面空間）
+components.html(snow_html, height=0, width=0)
 
 # --- 2. 初始化登入狀態 ---
 if 'token' not in st.session_state:
