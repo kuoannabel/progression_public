@@ -108,7 +108,7 @@ with col_auth:
         result = oauth2.authorize_button(
             name="Log in",
             icon=None,
-            redirect_uri="http://localhost:8501",
+            redirect_uri="https://progression-kuo.streamlit.app",
             scope="openid email profile",
             key="top_login_button"
         )
