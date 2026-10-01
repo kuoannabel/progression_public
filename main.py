@@ -100,95 +100,90 @@ let height = canvas.height = window.innerHeight;
 </script>
 """
 
-# --- ❄️ 互動式滑鼠風向下雪特效（直接渲染版） ---
-st.markdown("""
-    <div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999;">
-        <canvas id="snowCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
-    </div>
-    <script>
-    (function() {
-        const container = document.getElementById('snow-container');
-        if (!container) return;
-        
-        let canvas = document.getElementById('snowCanvas');
-        if (!canvas) {
-            canvas = document.createElement('canvas');
-            canvas.id = 'snowCanvas';
-            container.appendChild(canvas);
+import streamlit.components.v1 as components
+
+# --- ❄️ 滑鼠互動式下雪特效（完美獨立渲染版） ---
+snow_html = """
+<div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999; margin: 0; padding: 0; overflow: hidden;">
+    <canvas id="snowCanvas" style="display: block; width: 100vw; height: 100vh;"></canvas>
+</div>
+<script>
+(function() {
+    const canvas = document.getElementById('snowCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    let mouseX = width / 2;
+
+    // 追蹤整個畫面的滑鼠位置
+    window.parent.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+    });
+
+    const numFlakes = 100;
+    const flakes = [];
+
+    for (let i = 0; i < numFlakes; i++) {
+        flakes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: Math.random() * 2.5 + 1,
+            d: Math.random() * numFlakes,
+            speedY: Math.random() * 1.2 + 0.4
+        });
+    }
+
+    function drawSnow() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.beginPath();
+        for (let i = 0; i < numFlakes; i++) {
+            let f = flakes[i];
+            ctx.moveTo(f.x, f.y);
+            ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
         }
-        const ctx = canvas.getContext('2d');
+        ctx.fill();
+        updateSnow();
+    }
 
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
-        let mouseX = width / 2;
-
-        // 即時追蹤整個畫面的滑鼠位置
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-        });
-
-        const numFlakes = 100;
-        const flakes = [];
+    let angle = 0;
+    function updateSnow() {
+        angle += 0.01;
+        let wind = (mouseX - width / 2) / (width / 2) * 2.0;
 
         for (let i = 0; i < numFlakes; i++) {
-            flakes.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                r: Math.random() * 2.5 + 1, // 大小
-                d: Math.random() * numFlakes,
-                speedY: Math.random() * 1.2 + 0.4 // 下落速度
-            });
-        }
+            let f = flakes[i];
+            
+            f.y += f.speedY;
+            f.x += Math.sin(angle + f.d) * 0.4 + wind * 0.6;
 
-        function drawSnow() {
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // 雪花顏色
-            ctx.beginPath();
-            for (let i = 0; i < numFlakes; i++) {
-                let f = flakes[i];
-                ctx.moveTo(f.x, f.y);
-                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+            if (f.y > height) {
+                f.y = 0;
+                f.x = Math.random() * width;
             }
-            ctx.fill();
-            updateSnow();
-        }
-
-        let angle = 0;
-        function updateSnow() {
-            angle += 0.01;
-            // 根據滑鼠左右位置計算風向
-            let wind = (mouseX - width / 2) / (width / 2) * 2.0;
-
-            for (let i = 0; i < numFlakes; i++) {
-                let f = flakes[i];
-                
-                f.y += f.speedY;
-                f.x += Math.sin(angle + f.d) * 0.4 + wind * 0.6;
-
-                // 邊界循環
-                if (f.y > height) {
-                    f.y = 0;
-                    f.x = Math.random() * width;
-                }
-                if (f.x > width) {
-                    f.x = 0;
-                } else if (f.x < 0) {
-                    f.x = width;
-                }
+            if (f.x > width) {
+                f.x = 0;
+            } else if (f.x < 0) {
+                f.x = width;
             }
         }
+    }
 
-        // 啟動動畫
-        setInterval(drawSnow, 25);
-    })();
-    </script>
-""", unsafe_allow_html=True)
+    setInterval(drawSnow, 25);
+})();
+</script>
+"""
+
+# 透過元件載入（高度設為 0 讓它完全隱形不佔版面，但 JavaScript 會在背景執行全螢幕覆蓋）
+components.html(snow_html, height=0, width=0)
 
 # --- 2. 初始化登入狀態 ---
 if 'token' not in st.session_state:
