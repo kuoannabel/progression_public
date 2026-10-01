@@ -18,8 +18,8 @@ def load_user_data_from_cloud(email):
     else:
         default_data = {
             "email": email,
-            "level": 2,
-            "exp": 150,
+            "level": 1,
+            "exp": 0,
             "tasks": [
                 {"name": "Complete Main Quest: Study for 1 hour", "exp": 50},
                 {"name": "Side Quest: Read 20 pages of a book", "exp": 20},
@@ -203,7 +203,7 @@ else:
             Progress to Next Level: {current_data['exp']} / {needed_exp} EXP ({progress_pct}%)
         </div>
         <div style="width: 100%; background-color: #1a1c29; border: 1px solid rgba(250, 250, 250, 0.2); border-radius: 4px; overflow: hidden; padding: 2px; margin-bottom: 1rem;">
-            <div style="width: {progress_pct}%; background-color: #00FF66; height: 16px; border-radius: 2px; box-shadow: 0 0 8px rgba(0, 255, 102, 0.6);"></div>
+            <div style="width: {progress_pct}%; background-color: #00FF66; height: 16px; border-radius: 2px; box-shadow: 0 0 8px rgba(0, 255, 102, 0.6); transition: width 0.5s ease-in-out;"></div>
         </div>
     """, unsafe_allow_html=True)
     
