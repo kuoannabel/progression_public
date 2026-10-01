@@ -137,11 +137,11 @@ st.divider()
 
 # --- 4. 主畫面內容 ---
 with st.sidebar:
-    st.subheader("background style")
+    st.subheader("Background Style")
     
     # 讓使用者選擇背景風格
     theme_choice = st.selectbox(
-        "Theame Selection",
+        "Theme Selection",
         ["Dark Abyss", "Pixel Forest", "Magma Castle"]
     )
 
@@ -162,7 +162,7 @@ elif theme_choice == "Pixel Forest":
     }
     section[data-testid="stSidebar"] { background-color: #0e2419; }
     """
-else:  # 烈焰熔岩城堡
+else:  # Magma Castle
     bg_css = """
     .stApp {
         background-color: #1a0f0f;
