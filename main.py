@@ -90,7 +90,7 @@ st.markdown("""
 st.markdown("""
     <div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999;">
         <canvas id="snowCanvas"></canvas>
-    </div>
+    
     <script>
     const canvas = document.getElementById('snowCanvas');
     const ctx = canvas.getContext('2d');
@@ -169,6 +169,7 @@ st.markdown("""
     setInterval(drawSnow, 25);
     </script>
 """, unsafe_allow_html=True)
+
 # --- ❄️ 滑鼠互動式下雪特效 ---
 snow_html = """
 <div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 99999;">
