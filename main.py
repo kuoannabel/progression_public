@@ -4,6 +4,12 @@ from supabase import create_client, Client
 
 # --- Supabase 設定 ---
 
+# --- 從 Streamlit Secrets 讀取設定 ---
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+CLIENT_ID = st.secrets["CLIENT_ID"]
+CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 雲端資料同步函數 ---
