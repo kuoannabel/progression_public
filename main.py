@@ -3,8 +3,6 @@ from streamlit_oauth import OAuth2Component
 from supabase import create_client, Client
 
 # --- Supabase 設定 ---
-
-# --- 從 Streamlit Secrets 讀取設定 ---
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 CLIENT_ID = st.secrets["CLIENT_ID"]
@@ -38,8 +36,6 @@ def save_user_data_to_cloud(email, level, exp, tasks):
     }).eq("email", email).execute()
 
 # --- 1. Google OAuth 設定 ---
-
-
 AUTHORIZE_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 
@@ -105,14 +101,15 @@ with col_title:
 with col_auth:
     st.markdown("<br>", unsafe_allow_html=True)
     if not st.session_state.token:
-        # 動態取得當前瀏覽器的網址作為 redirect_uri，解決手機與電腦端不匹配問題
-        try:
-            from streamlit.runtime.scriptrunner import get_script_run_ctx
-            ctx = get_script_run_ctx()
-            # 兼容不同環境下的網址取得
-            current_url = "https://progression-kuo.streamlit.app"
-        except Exception:
-            current_url = "https://progression-kuo.streamlit.app"
+        current_url = "https://progression-kuo.streamlit.app"
+
+        result = oauth2.authorize_button(
+            name="Log in",
+            icon=None,
+            redirect_uri=current_url,
+            scope="openid email profile",
+            key="top_login_button"
+        )
         if result:
             st.session_state.token = result.get("token")
             import jwt
@@ -121,7 +118,6 @@ with col_auth:
                 user_data_jwt = jwt.decode(id_token, options={"verify_signature": False})
                 st.session_state.user_info = user_data_jwt
                 
-                # 🚀 關鍵優化：只在剛登入時向雲端抓取一次資料並放入 session_state 快取
                 email = user_data_jwt.get("email")
                 st.session_state.user_data = load_user_data_from_cloud(email)
                 
@@ -143,7 +139,6 @@ if not st.session_state.token:
     st.markdown("Please click the **Log in** button in the top right corner to start your RPG journey.")
 
 else:
-    # 如果重新整理但 session 裡剛好沒有快取，補抓一次
     if st.session_state.user_data is None:
         email = st.session_state.user_info.get("email")
         st.session_state.user_data = load_user_data_from_cloud(email)
@@ -151,9 +146,6 @@ else:
     current_data = st.session_state.user_data
     user_email = current_data["email"]
 
-   
-    # --- 💡 升級門檻改為：級數 * 100 ---
-    # 計算當前等級升下一級所需的總經驗值門檻 (例如 Lv.2 升 Lv.3 需要 2 * 100 = 200 點)
     needed_exp = current_data["level"] * 100
     progress_ratio = min(current_data["exp"] / needed_exp, 1.0)
     
@@ -170,20 +162,16 @@ else:
             if st.button(f"- {task['name']} (+{task['exp']} XP)", key=f"task_{index}"):
                 current_data["exp"] += task['exp']
                 
-                # 升級判定：若經驗值大於等於當前等級所需門檻，則升級並扣除該門檻（保留剩餘經驗值）
                 while current_data["exp"] >= current_data["level"] * 100:
                     current_data["exp"] -= current_data["level"] * 100
                     current_data["level"] += 1
                     st.success(f"Level Up! You reached Lv. {current_data['level']}!")
                 
-                # 背景同步至雲端
                 save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"])
                 st.rerun()
         with col2:
             if st.button("🗑️", key=f"del_{index}"):
                 current_data["tasks"].pop(index)
-                
-                # 背景同步至雲端
                 save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"])
                 st.rerun()
 
@@ -199,8 +187,6 @@ else:
         if submit_button:
             if new_task_name.strip():
                 current_data["tasks"].append({"name": new_task_name, "exp": new_task_exp})
-                
-                # 背景同步至雲端
                 save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"])
                 st.success(f"New quest added: {new_task_name}!")
                 st.rerun()
