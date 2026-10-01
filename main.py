@@ -97,7 +97,47 @@ col_title, col_auth = st.columns([3, 1])
 
 with col_title:
     st.title("Progression")
+with st.sidebar:
+    st.subheader("🎨 冒險主題設定")
+    
+    # 讓使用者選擇背景風格
+    theme_choice = st.selectbox(
+        "選擇你的世界觀 (Theme)",
+        ["經典深淵黑 (Dark Abyss)", "復古像素森林 (Pixel Forest)", "烈焰熔岩城堡 (Magma Castle)"]
+    )
 
+# 根據使用者的選擇動態切換 CSS 樣式
+if theme_choice == "經典深淵黑 (Dark Abyss)":
+    bg_css = """
+    .stApp {
+        background-color: #0f111a;
+        background-image: linear-gradient(to bottom, #0f111a, #1a1c29);
+    }
+    section[data-testid="stSidebar"] { background-color: #141622; }
+    """
+elif theme_choice == "復古像素森林 (Pixel Forest)":
+    bg_css = """
+    .stApp {
+        background-color: #0b1a12;
+        background-image: linear-gradient(to bottom, #0b1a12, #132e20);
+    }
+    section[data-testid="stSidebar"] { background-color: #0e2419; }
+    """
+else:  # 烈焰熔岩城堡
+    bg_css = """
+    .stApp {
+        background-color: #1a0f0f;
+        background-image: linear-gradient(to bottom, #1a0f0f, #2e1313);
+    }
+    section[data-testid="stSidebar"] { background-color: #240e0e; }
+    """
+
+# 將動態背景樣式套用到畫面上
+st.markdown(f"""
+    <style>
+    {bg_css}
+    </style>
+""", unsafe_allow_html=True)
 with col_auth:
     st.markdown("<br>", unsafe_allow_html=True)
     if not st.session_state.token:
