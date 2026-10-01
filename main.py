@@ -105,13 +105,14 @@ with col_title:
 with col_auth:
     st.markdown("<br>", unsafe_allow_html=True)
     if not st.session_state.token:
-        result = oauth2.authorize_button(
-            name="Log in",
-            icon=None,
-            redirect_uri="https://progression-kuo.streamlit.app",
-            scope="openid email profile",
-            key="top_login_button"
-        )
+        # 動態取得當前瀏覽器的網址作為 redirect_uri，解決手機與電腦端不匹配問題
+        try:
+            from streamlit.runtime.scriptrunner import get_script_run_ctx
+            ctx = get_script_run_ctx()
+            # 兼容不同環境下的網址取得
+            current_url = "https://progression-kuo.streamlit.app"
+        except Exception:
+            current_url = "https://progression-kuo.streamlit.app"
         if result:
             st.session_state.token = result.get("token")
             import jwt
