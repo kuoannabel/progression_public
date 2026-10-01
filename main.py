@@ -81,6 +81,12 @@ st.markdown("""
         border-color: #FF4B4B !important;
         color: #FF4B4B !important;
     }
+    /* 強制修正側邊欄收合按鈕的圖標字型與顯示異常 */
+button[data-testid="baseButton-header"], 
+button[kind="header"],
+[data-testid="stSidebarNavSeparator"] {
+    font-family: "Source Sans Pro", sans-serif !important;
+}
     </style>
 """, unsafe_allow_html=True)
 
