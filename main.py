@@ -66,7 +66,10 @@ st.markdown("""
         font-size: 1.6rem !important;
         color: #FF4B4B;
     }
-    
+    /* 🟢 這裡修改：將進度條填充顏色改為亮綠色 (Neon Green) */
+    div[data-testid="stProgress"] div[role="progressbar"] {
+        background-color: #00FF66 !important;
+    }
     /* 🛠️ 徹底修復側邊欄按鈕：隱藏內部所有預設圖標/文字，並換成自訂按鈕 */
     [data-testid="collapsedControl"] {
         background-color: #0e1117 !important;
