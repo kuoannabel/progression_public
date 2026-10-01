@@ -67,23 +67,28 @@ st.markdown("""
         color: #FF4B4B;
     }
     
-    /* 🛠️ 完美修復側邊欄按鈕：將破圖文字變透明，並換成自訂按鈕圖標 */
+    /* 🛠️ 徹底修復側邊欄按鈕：隱藏內部所有預設圖標/文字，並換成自訂按鈕 */
     [data-testid="collapsedControl"] {
-        color: transparent !important;
+        background-color: #0e1117 !important;
+        border: 1px solid rgba(250, 250, 250, 0.2) !important;
+        border-radius: 4px !important;
+        padding: 4px 10px !important;
     }
 
+    /* 隱藏按鈕內部的原生成員（文字與 SVG）避免破圖殘影 */
+    [data-testid="collapsedControl"] svg,
+    [data-testid="collapsedControl"] span,
+    [data-testid="collapsedControl"] div {
+        display: none !important;
+    }
+
+    /* 顯示自訂的選單文字 */
     [data-testid="collapsedControl"]::after {
         content: "⚙️ 選單" !important;
         color: #fafafa !important;
         font-family: 'Courier New', monospace !important;
         font-size: 0.85rem !important;
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        background: #0e1117;
-        padding: 4px 10px;
-        border: 1px solid rgba(250, 250, 250, 0.2);
-        border-radius: 4px;
+        display: inline-block !important;
     }
     
     div[data-testid="column"] button {
@@ -103,6 +108,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+   
 
 # --- 2. 初始化登入狀態 ---
 if 'token' not in st.session_state:
