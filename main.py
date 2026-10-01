@@ -100,7 +100,7 @@ let height = canvas.height = window.innerHeight;
 </script>
 """
 
-st.snow()
+#st.snow()
 # --- ❄️ 純 CSS 動態雪花特效（穩定且保證看得見） ---
 st.markdown("""
     <style>
