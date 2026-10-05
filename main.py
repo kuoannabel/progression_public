@@ -260,24 +260,14 @@ else:
     current_data = st.session_state.user_data
     user_email = current_data["email"]
 
-    # --- 🎯 主線大目標區塊（精簡版 + 隱藏式編輯） ---
-    col_goal_title, col_goal_btn = st.columns([10, 1])
-    #with col_goal_title:
-       # st.subheader("🎯")
-    with col_goal_btn:
-        st.markdown("<br>", unsafe_allow_html=True)
-        # 點擊鉛筆圖標切換編輯狀態
-        if st.button("✏️", key="toggle_edit_goal"):
-            st.session_state.is_editing_goal = not st.session_state.is_editing_goal
-            st.rerun()
-
+    # --- 🎯 主線大目標區塊（純內文 + 旁邊的小編輯按鈕） ---
     current_goal = current_data.get("goal", "Set your grand objective here...")
 
     if st.session_state.is_editing_goal:
         # 展開編輯狀態
         with st.form("update_goal_form"):
             new_goal = st.text_input("Edit Grand Objective", value=current_goal)
-            col_save, col_cancel = st.columns([1, 5])
+            col_save, _ = st.columns([1, 5])
             with col_save:
                 submit_goal = st.form_submit_button("Save")
             
@@ -291,12 +281,18 @@ else:
                 else:
                     st.warning("Objective cannot be empty.")
     else:
-        # 平時狀態：直接乾淨地顯示文字，沒有多餘的大卡片背景
-        st.markdown(f"""
-            <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; color: #fafafa; padding: 0.5rem 0; margin-bottom: 1rem;">
-                 <b>🎯{current_goal}</b>
-            </div>
-        """, unsafe_allow_html=True)
+        # 平時狀態：同行顯示大目標與 ✏️ 按鈕
+        col_text, col_btn = st.columns([12, 1])
+        with col_text:
+            st.markdown(f"""
+                <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; color: #fafafa; padding-top: 5px;">
+                    🎯 <b>{current_goal}</b>
+                </div>
+            """, unsafe_allow_html=True)
+        with col_btn:
+            if st.button("✏️", key="toggle_edit_goal"):
+                st.session_state.is_editing_goal = not st.session_state.is_editing_goal
+                st.rerun()
 
     st.divider()
 
