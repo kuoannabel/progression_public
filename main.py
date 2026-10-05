@@ -164,6 +164,8 @@ if 'user_info' not in st.session_state:
     st.session_state.user_info = None
 if 'user_data' not in st.session_state:
     st.session_state.user_data = None
+if 'is_editing_goal' not in st.session_state:
+    st.session_state.is_editing_goal = False
 
 # --- 3. 頂部導覽列：左側標題，右側登入/登出按鈕 ---
 col_title, col_auth = st.columns([3, 1])
@@ -258,21 +260,43 @@ else:
     current_data = st.session_state.user_data
     user_email = current_data["email"]
 
-    # --- 🎯 主線大目標區塊 ---
-    st.subheader("🎯 Grand Objective (Main Quest)")
-    with st.form("update_goal_form"):
-        current_goal = current_data.get("goal", "Set your grand objective here...")
-        new_goal = st.text_input("Current Grand Objective", value=current_goal)
-        update_goal_btn = st.form_submit_button("Save Objective")
-        
-        if update_goal_btn:
-            if new_goal.strip():
-                current_data["goal"] = new_goal
-                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"], current_data["goal"])
-                st.success("Grand objective updated successfully!")
-                st.rerun()
-            else:
-                st.warning("Objective cannot be empty.")
+    # --- 🎯 主線大目標區塊（精簡版 + 隱藏式編輯） ---
+    col_goal_title, col_goal_btn = st.columns([10, 1])
+    with col_goal_title:
+        st.subheader("🎯 Grand Objective (Main Quest)")
+    with col_goal_btn:
+        st.markdown("<br>", unsafe_allow_html=True)
+        # 點擊鉛筆圖標切換編輯狀態
+        if st.button("✏️", key="toggle_edit_goal"):
+            st.session_state.is_editing_goal = not st.session_state.is_editing_goal
+            st.rerun()
+
+    current_goal = current_data.get("goal", "Set your grand objective here...")
+
+    if st.session_state.is_editing_goal:
+        # 展開編輯狀態
+        with st.form("update_goal_form"):
+            new_goal = st.text_input("Edit Grand Objective", value=current_goal)
+            col_save, col_cancel = st.columns([1, 5])
+            with col_save:
+                submit_goal = st.form_submit_button("Save")
+            
+            if submit_goal:
+                if new_goal.strip():
+                    current_data["goal"] = new_goal
+                    save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"], current_data["goal"])
+                    st.session_state.is_editing_goal = False
+                    st.success("Objective updated!")
+                    st.rerun()
+                else:
+                    st.warning("Objective cannot be empty.")
+    else:
+        # 平時狀態：直接乾淨地顯示文字，沒有多餘的大卡片背景
+        st.markdown(f"""
+            <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; color: #fafafa; padding: 0.5rem 0; margin-bottom: 1rem;">
+                👉 <b>{current_goal}</b>
+            </div>
+        """, unsafe_allow_html=True)
 
     st.divider()
 
