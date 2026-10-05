@@ -96,6 +96,13 @@ st.markdown("""
         border-color: #FF4B4B !important;
         color: #FF4B4B !important;
     }
+    /* 讓編輯按鈕變小、更精緻 */
+    button[key="toggle_edit_goal"], div[data-testid="column"] button[kind="secondary"] {
+        padding: 0rem 0.3rem !important;
+        font-size: 0.7rem !important;
+        min-height: 24px !important;
+        max-height: 28px !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
