@@ -206,7 +206,7 @@ with col_auth:
             st.session_state.user_data = None
             st.rerun()
 
-st.divider()
+
 
 # --- 🎯 緊貼在頂部分隔線下方的 Grand Objective ---
 if st.session_state.token and st.session_state.user_data:
@@ -235,13 +235,14 @@ if st.session_state.token and st.session_state.user_data:
         with col_goal_text:
             st.markdown(f"""
                 <div style="font-family: 'Courier New', monospace; font-size: 1rem; color: #a0a0a0; margin-top: -5px; margin-bottom: 5px;">
-                    🎯 <b>Grand Objective:</b> <span style="color: #fafafa;">{current_goal}</span>
+                    🎯  <span style="color: #fafafa;">{current_goal}</span>
                 </div>
             """, unsafe_allow_html=True)
         with col_goal_btn:
             if st.button("✏️", key="toggle_edit_goal"):
                 st.session_state.is_editing_goal = not st.session_state.is_editing_goal
                 st.rerun()
+    st.divider()
 
 # --- 4. 主畫面內容 ---
 with st.sidebar:
