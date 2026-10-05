@@ -263,7 +263,7 @@ else:
     # --- 🎯 主線大目標區塊（精簡版 + 隱藏式編輯） ---
     col_goal_title, col_goal_btn = st.columns([10, 1])
     with col_goal_title:
-        st.subheader("🎯 Grand Objective (Main Quest)")
+        st.subheader("🎯")
     with col_goal_btn:
         st.markdown("<br>", unsafe_allow_html=True)
         # 點擊鉛筆圖標切換編輯狀態
@@ -294,7 +294,7 @@ else:
         # 平時狀態：直接乾淨地顯示文字，沒有多餘的大卡片背景
         st.markdown(f"""
             <div style="font-family: 'Courier New', monospace; font-size: 1.1rem; color: #fafafa; padding: 0.5rem 0; margin-bottom: 1rem;">
-                👉 <b>{current_goal}</b>
+                 <b>🎯{current_goal}</b>
             </div>
         """, unsafe_allow_html=True)
 
