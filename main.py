@@ -1,11 +1,19 @@
 import streamlit as st
+
 from streamlit_oauth import OAuth2Component
+
 from supabase import create_client, Client
+
 import streamlit.components.v1 as components
+
 # --- Supabase 設定 ---
+
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
+
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+
 CLIENT_ID = st.secrets["CLIENT_ID"]
+
 CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -14,12 +22,16 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 def load_user_data_from_cloud(email):
     response = supabase.table("profiles").select("*").eq("email", email).execute()
     if response.data and len(response.data) > 0:
-        return response.data[0]
+        data = response.data[0]
+        if not data.get("goal"):
+            data["goal"] = "Become a Legendary Developer & Master Python!"
+        return data
     else:
         default_data = {
             "email": email,
             "level": 1,
             "exp": 0,
+            "goal": "Become a Legendary Developer & Master Python!",
             "tasks": [
                 {"name": "Complete Main Quest: Study for 1 hour", "exp": 50},
                 {"name": "Side Quest: Read 20 pages of a book", "exp": 20},
@@ -28,11 +40,13 @@ def load_user_data_from_cloud(email):
         supabase.table("profiles").insert(default_data).execute()
         return default_data
 
-def save_user_data_to_cloud(email, level, exp, tasks):
+# 修正：補上 goal 參數以便同步儲存大目標
+def save_user_data_to_cloud(email, level, exp, tasks, goal):
     supabase.table("profiles").update({
         "level": level,
         "exp": exp,
-        "tasks": tasks
+        "tasks": tasks,
+        "goal": goal
     }).eq("email", email).execute()
 
 # --- 1. Google OAuth 設定 ---
@@ -85,26 +99,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
-# --- ❄️ 滑鼠互動式下雪特效（唯一正確版本） ---
-snow_html = """
-<div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2147483647;">
-    <canvas id="snowCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
-</div>
-<script>
-const canvas = document.getElementById('snowCanvas');
-const ctx = canvas.getContext('2d');
-
-let width = canvas.width = window.innerWidth;
-let height = canvas.height = window.innerHeight;
-</script>
-"""
-
-#st.snow()
-# --- ❄️ 純 CSS 動態雪花特效（穩定且保證看得見） ---
+# --- ❄️ 純 CSS 動態雪花特效 ---
 st.markdown("""
     <style>
-    /* 讓整個下雪容器覆蓋全螢幕且不擋住點擊 */
     .snow-container {
         position: fixed;
         top: 0;
@@ -115,8 +112,6 @@ st.markdown("""
         z-index: 999999;
         overflow: hidden;
     }
-
-    /* 單顆雪花的基礎樣式 */
     .snowflake {
         position: absolute;
         top: -10px;
@@ -125,32 +120,21 @@ st.markdown("""
         opacity: 0.8;
         animation: fall linear infinite;
     }
-
-    /* 雪花往下掉落的動畫 */
     @keyframes fall {
-        0% {
-            transform: translateY(-10px) translateX(0);
-        }
-        50% {
-            transform: translateY(50vh) translateX(20px);
-        }
-        100% {
-            transform: translateY(105vh) translateX(-20px);
-        }
+        0% { transform: translateY(-10px) translateX(0); }
+        50% { transform: translateY(50vh) translateX(20px); }
+        100% { transform: translateY(105vh) translateX(-20px); }
     }
-
-    /* 隨機產生不同大小、位置與速度的雪花 */
-    .snowflake:nth-of-type(1) { left: 5%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 0s; }
-    .snowflake:nth-of-type(2) { left: 15%; width: 4px; height: 4px; animation-duration: 9s; animation-delay: 2s; }
-    .snowflake:nth-of-type(3) { left: 25%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 1s; }
-    .snowflake:nth-of-type(4) { left: 35%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 3s; }
-    .snowflake:nth-of-type(5) { left: 45%; width: 7px; height: 7px; animation-duration: 6s; animation-delay: 0.5s; }
-    .snowflake:nth-of-type(6) { left: 55%; width: 4px; height: 4px; animation-duration: 10s; animation-delay: 4s; }
-    .snowflake:nth-of-type(7) { left: 65%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 1.5s; }
-    .snowflake:nth-of-type(8) { left: 75%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 2.5s; }
-    .snowflake:nth-of-type(9) { left: 85%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 3.5s; }
+    .snowflake:nth-of-type(1)  { left: 5%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 0s; }
+    .snowflake:nth-of-type(2)  { left: 15%; width: 4px; height: 4px; animation-duration: 9s; animation-delay: 2s; }
+    .snowflake:nth-of-type(3)  { left: 25%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 1s; }
+    .snowflake:nth-of-type(4)  { left: 35%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 3s; }
+    .snowflake:nth-of-type(5)  { left: 45%; width: 7px; height: 7px; animation-duration: 6s; animation-delay: 0.5s; }
+    .snowflake:nth-of-type(6)  { left: 55%; width: 4px; height: 4px; animation-duration: 10s; animation-delay: 4s; }
+    .snowflake:nth-of-type(7)  { left: 65%; width: 6px; height: 6px; animation-duration: 7s; animation-delay: 1.5s; }
+    .snowflake:nth-of-type(8)  { left: 75%; width: 8px; height: 8px; animation-duration: 5s; animation-delay: 2.5s; }
+    .snowflake:nth-of-type(9)  { left: 85%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 3.5s; }
     .snowflake:nth-of-type(10) { left: 95%; width: 6px; height: 6px; animation-duration: 6s; animation-delay: 1s; }
-    
     .snowflake:nth-of-type(11) { left: 10%; width: 5px; height: 5px; animation-duration: 8s; animation-delay: 4s; }
     .snowflake:nth-of-type(12) { left: 20%; width: 7px; height: 7px; animation-duration: 6s; animation-delay: 1s; }
     .snowflake:nth-of-type(13) { left: 30%; width: 4px; height: 4px; animation-duration: 11s; animation-delay: 3s; }
@@ -163,27 +147,16 @@ st.markdown("""
     </style>
 
     <div class="snow-container">
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
-        <div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
+        <div class="snowflake"></div><div class="snowflake"></div><div class="snowflake"></div>
         <div class="snowflake"></div>
     </div>
 """, unsafe_allow_html=True)
+
 # --- 2. 初始化登入狀態 ---
 if 'token' not in st.session_state:
     st.session_state.token = None
@@ -237,13 +210,11 @@ st.divider()
 with st.sidebar:
     st.subheader("Background Style")
     
-    # 讓使用者選擇背景風格（選項與對應名稱保持一致）
     theme_choice = st.selectbox(
         "Theme Selection",
         ["Dark Abyss", "Pixel Forest", "Magma Castle"]
     )
 
-# 根據使用者的選擇動態切換 CSS 樣式
 if theme_choice == "Dark Abyss":
     bg_css = """
     .stApp {
@@ -260,7 +231,7 @@ elif theme_choice == "Pixel Forest":
     }
     section[data-testid="stSidebar"] { background-color: #0e2419; }
     """
-else:  # Magma Castle
+else:
     bg_css = """
     .stApp {
         background-color: #1a0f0f;
@@ -269,7 +240,6 @@ else:  # Magma Castle
     section[data-testid="stSidebar"] { background-color: #240e0e; }
     """
 
-# 將動態背景樣式套用到畫面上
 st.markdown(f"""
     <style>
     {bg_css}
@@ -288,21 +258,37 @@ else:
     current_data = st.session_state.user_data
     user_email = current_data["email"]
 
+    # --- 🎯 主線大目標區塊 ---
+    st.subheader("🎯 Grand Objective (Main Quest)")
+    with st.form("update_goal_form"):
+        current_goal = current_data.get("goal", "Set your grand objective here...")
+        new_goal = st.text_input("Current Grand Objective", value=current_goal)
+        update_goal_btn = st.form_submit_button("Save Objective")
+        
+        if update_goal_btn:
+            if new_goal.strip():
+                current_data["goal"] = new_goal
+                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"], current_data["goal"])
+                st.success("Grand objective updated successfully!")
+                st.rerun()
+            else:
+                st.warning("Objective cannot be empty.")
+
+    st.divider()
+
     needed_exp = current_data["level"] * 100
     progress_ratio = min(current_data["exp"] / needed_exp, 1.0)
     
     st.metric(label="Level", value=f"Lv. {current_data['level']}", delta=f"Total EXP: {current_data['exp']}")
     
-    # 計算百分比 (0 ~ 100)
     progress_pct = int(progress_ratio * 100)
 
-    # 自訂 RPG 風格的亮綠色經驗條 experience bar 動態效果
+    # 修正：移除多餘的 div 確保經驗條結構乾淨
     st.markdown(f"""
         <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 4px; color: #fafafa;">
             Progress to Next Level: {current_data['exp']} / {needed_exp} EXP ({progress_pct}%)
         </div>
         <div style="width: 100%; background-color: #1a1c29; border: 1px solid rgba(250, 250, 250, 0.2); border-radius: 4px; overflow: hidden; padding: 2px; margin-bottom: 1rem;">
-        <div>
             <div style="width: {progress_pct}%; background-color: #00FF66; height: 16px; border-radius: 2px; box-shadow: 0 0 8px rgba(0, 255, 102, 0.6); transition: width 0.5s ease-in-out;"></div>
         </div>
     """, unsafe_allow_html=True)
@@ -322,12 +308,14 @@ else:
                     current_data["level"] += 1
                     st.success(f"Level Up! You reached Lv. {current_data['level']}!")
                 
-                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"])
+                # 修正：補上 goal 參數
+                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"], current_data["goal"])
                 st.rerun()
         with col2:
             if st.button("🗑️", key=f"del_{index}"):
                 current_data["tasks"].pop(index)
-                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"])
+                # 修正：補上 goal 參數
+                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"], current_data["goal"])
                 st.rerun()
 
     st.divider()
@@ -342,7 +330,8 @@ else:
         if submit_button:
             if new_task_name.strip():
                 current_data["tasks"].append({"name": new_task_name, "exp": new_task_exp})
-                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"])
+                # 修正：補上 goal 參數
+                save_user_data_to_cloud(user_email, current_data["level"], current_data["exp"], current_data["tasks"], current_data["goal"])
                 st.success(f"New quest added: {new_task_name}!")
                 st.rerun()
             else:
