@@ -262,8 +262,8 @@ else:
 
     # --- 🎯 主線大目標區塊（精簡版 + 隱藏式編輯） ---
     col_goal_title, col_goal_btn = st.columns([10, 1])
-    with col_goal_title:
-        st.subheader("🎯")
+    #with col_goal_title:
+       # st.subheader("🎯")
     with col_goal_btn:
         st.markdown("<br>", unsafe_allow_html=True)
         # 點擊鉛筆圖標切換編輯狀態
