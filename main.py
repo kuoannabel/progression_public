@@ -207,7 +207,7 @@ with col_auth:
             st.rerun()
 
 
-
+st.divider()
 # --- 🎯 緊貼在頂部分隔線下方的 Grand Objective ---
 if st.session_state.token and st.session_state.user_data:
     current_data = st.session_state.user_data
