@@ -243,7 +243,7 @@ if st.session_state.token and st.session_state.user_data:
         with col_goal_text:
             st.markdown(f"""
                 <div style="font-family: 'Courier New', monospace; font-size: 1.5rem; color: #a0a0a0; margin-top: -5px; margin-bottom: 4px;">
-                    🎯  <span style="color: #fafafa;">{current_goal}</span>
+                      <span style="color: #fafafa;">{current_goal}</span>
                 </div>
             """, unsafe_allow_html=True)
         with col_goal_btn:
