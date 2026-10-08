@@ -374,6 +374,31 @@ else:
     let timerInterval = null;
     let isRunning = false;
 
+    // 🔊 內建 RPG 勝利音效合成器 (Web Audio API)
+    function playVictorySound() {{
+        try {{
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, index) => {{
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                let startTime = audioCtx.currentTime + index * 0.12;
+                gain.gain.setValueAtTime(0.15, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+                
+                osc.start(startTime);
+                osc.stop(startTime + 0.3);
+            }});
+        }} catch(e) {{
+            console.log("Audio not supported");
+        }}
+    }}
+
     function updateDisplay() {{
         let minutes = Math.floor(totalSeconds / 60);
         let seconds = totalSeconds % 60;
@@ -393,6 +418,7 @@ else:
                     clearInterval(timerInterval);
                     isRunning = false;
                     document.getElementById('start-btn').innerText = "Start";
+                    playVictorySound(); // 播放音效
                     alert("Quest Time Completed! Great job Adventurer!");
                 }}
             }}, 1000);
@@ -414,7 +440,7 @@ else:
     updateDisplay();
     </script>
     """
-    components.html(timer_html, height=110)
+    components.html(timer_html, height=120)
     # 新增任務區塊
     st.subheader("+ Create a New Quest")
     with st.form("add_task_form"):
