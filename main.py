@@ -414,7 +414,7 @@ else:
     updateDisplay();
     </script>
     """
-    components.html(timer_html, height=110, width=0)
+    components.html(timer_html, height=110)
     # 新增任務區塊
     st.subheader("+ Create a New Quest")
     with st.form("add_task_form"):
