@@ -349,7 +349,72 @@ else:
                 st.rerun()
 
     st.divider()
+    # --- ⏳ 內嵌 RPG 專注計時器 (Pomodoro Timer) ---
+    st.subheader("⏳ Focus Timer")
+    timer_mode = st.selectbox("Timer Mode", ["Pomodoro (25m)", "Short Break (5m)", "Deep Work (50m)"])
+    
+    # 根據選擇設定秒數
+    if "25m" in timer_mode:
+        default_seconds = 1500
+    elif "5m" in timer_mode:
+        default_seconds = 300
+    else:
+        default_seconds = 3000
 
+    # 修正：將 JavaScript 獨立出來，避免 f-string 的大括號衝突
+    timer_html = f"""
+    <div style="font-family: 'Courier New', monospace; text-align: center; background-color: #141622; padding: 10px; border-radius: 6px; border: 1px solid rgba(250, 250, 250, 0.1);">
+        <div id="timer-display" style="font-size: 1.8rem; font-weight: bold; color: #00FF66; margin-bottom: 8px;">25:00</div>
+        <button id="start-btn" onclick="startTimer()" style="background-color: #0e1117; color: #fafafa; border: 1px solid rgba(250, 250, 250, 0.3); padding: 4px 12px; border-radius: 4px; cursor: pointer; font-family: 'Courier New', monospace;">Start</button>
+        <button id="reset-btn" onclick="resetTimer()" style="background-color: #0e1117; color: #fafafa; border: 1px solid rgba(250, 250, 250, 0.3); padding: 4px 12px; border-radius: 4px; cursor: pointer; font-family: 'Courier New', monospace; margin-left: 5px;">Reset</button>
+    </div>
+
+    <script>
+    let totalSeconds = {default_seconds};
+    let timerInterval = null;
+    let isRunning = false;
+
+    function updateDisplay() {{
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds % 60;
+        document.getElementById('timer-display').innerText = 
+            String(minutes).padStart(2, '0') + ":" + String(seconds).padStart(2, '0');
+    }}
+
+    function startTimer() {{
+        if (!isRunning) {{
+            isRunning = true;
+            document.getElementById('start-btn').innerText = "Pause";
+            timerInterval = setInterval(() => {{
+                if (totalSeconds > 0) {{
+                    totalSeconds--;
+                    updateDisplay();
+                }} else {{
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    document.getElementById('start-btn').innerText = "Start";
+                    alert("Quest Time Completed! Great job Adventurer!");
+                }}
+            }}, 1000);
+        }} else {{
+            isRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('start-btn').innerText = "Start";
+        }}
+    }}
+
+    function resetTimer() {{
+        clearInterval(timerInterval);
+        isRunning = false;
+        totalSeconds = {default_seconds};
+        updateDisplay();
+        document.getElementById('start-btn').innerText = "Start";
+    }}
+
+    updateDisplay();
+    </script>
+    """
+    components.html(timer_html, height=110, width=0)
     # 新增任務區塊
     st.subheader("+ Create a New Quest")
     with st.form("add_task_form"):
